@@ -1,3 +1,37 @@
 .fkw-menu {
+  width: fit-content;
+  position: relative;
 
+  &_trigger {
+    
+  }
+
+  &_wrapper {
+    position: absolute;
+    display: flex;
+  }
+
+  &_content {
+    width: fit-content;
+  }
+}
+
+//
+
+.fkw-menu {
+  background: red;
+
+  &_trigger {
+    background: green;
+    width: 300px;
+  }
+
+  &_wrapper {
+    background: blue;
+    width: 500px;
+  }
+
+  &_content {
+    background: yellow; 
+  }
 }

@@ -1,26 +1,55 @@
 import { ReactNode } from "react";
 
-export interface MenuContextProps {
+export type TMenuDirection = 'top' | 'bottom' | 'left' | 'right'
+export type TMenuAlign = 'center' | 'left' | 'right' | 'stretch'
+
+export interface IMenuContextProps {
   isOpen: boolean
   toggleMenu: () => void
 }
 
+export interface IMenuSettings {
+  /** Menu direction from trigger
+   * @default 'bottom'
+   */
+  direction?: TMenuDirection
 
-
-export interface MenuProps {
-  className?: string
-  children: ReactNode
+  /** Menu alignment to trigger
+   * @default 'center'
+   */
+  align?: TMenuAlign
 }
 
-export interface MenuTriggerProps {
+
+
+export interface IMenuProps {
+  className?: string
+  children: ReactNode
+  settings?: IMenuSettings
+
+  /** Gap between primary trigger and menu
+   * @default 16
+   */
+  gap?: number
+}
+
+export interface IMenuTriggerProps {
   className?: string
   children: ReactNode
 
   /** Onclick callback */
   callback?: () => void
+
+  /** Defines main element for positioning menu */
+  primary: boolean
 }
 
-export interface MenuWrapperProps {
+export interface IMenuWrapperProps {
+  className?: string
+  children: ReactNode
+}
+
+export interface IMenuContentProps {
   className?: string
   children: ReactNode
 }
