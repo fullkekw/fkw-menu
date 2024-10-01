@@ -18,6 +18,11 @@ export interface IMenuSettings {
    * @default 'center'
    */
   align?: TMenuAlign
+
+  /** Verbose mode will color elements offsets
+   * @default false
+   */
+  verbose?: boolean
 }
 
 

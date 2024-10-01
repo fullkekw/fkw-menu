@@ -16,6 +16,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
   const settings = (sets === undefined ? {} : sets) as Required<IMenuSettings>;
   settings.align = settings.align === undefined ? 'center' : settings.align;
   settings.direction = settings.direction === undefined ? 'bottom' : settings.direction;
+  settings.verbose = settings.verbose === undefined ? false : settings.verbose;
   gap = gap == undefined ? 16 : gap;
 
 
@@ -26,24 +27,26 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
   }, []);
 
   useEffect(() => {
-    const parent = document.querySelector(`#fkw-menu--${ID}`);
+    const parent = document.querySelector(`#fkw-menu--${ID}`) as HTMLDivElement | undefined;
     if (!parent) return console.error(`[fkw-menu]: Parent is not found`);
 
-    const wrapper = parent.querySelector(`.fkw-menu_wrapper`) as HTMLDivElement;
-    const trigger = parent.querySelector(`.fkw-menu_trigger--primary`) as HTMLButtonElement;
+    const wrapper = parent.querySelector(`.fkw-menu_wrapper`) as HTMLDivElement | undefined;
+    const trigger = parent.querySelector(`.fkw-menu_trigger--primary`) as HTMLButtonElement | undefined;
     if (!wrapper || !trigger) return console.error(`[fkw-menu]: Menu wrapper or trigger are not found`);
 
     const { align, direction } = settings;
 
+    let initialWrapperWidth = wrapper.offsetWidth;
+
     window.addEventListener('resize', () => {
       calculateDirection(direction, gap, wrapper, trigger);
-      calculateAlignment(align, direction, wrapper, trigger);
+      calculateAlignment({ align, direction, initialWrapperWidth, wrapper, trigger, parent });
     });
 
     calculateDirection(direction, gap, wrapper, trigger);
-    calculateAlignment(align, direction, wrapper, trigger);
+    calculateAlignment({ align, direction, initialWrapperWidth, wrapper, trigger, parent });
 
-  }, [])
+  }, []);
 
   // Handle state
   useEffect(() => {
@@ -101,14 +104,34 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
     }
   }
 
-  function calculateAlignment(align: TMenuAlign, direction: TMenuDirection, wrapper: HTMLDivElement, trigger: HTMLButtonElement) {
+  function calculateAlignment({ align, direction, initialWrapperWidth, trigger, wrapper, parent }: { align: TMenuAlign, direction: TMenuDirection, initialWrapperWidth: number, wrapper: HTMLDivElement, trigger: HTMLButtonElement, parent: HTMLDivElement }) {
     switch (align) {
       case 'center': {
         if (direction === 'left' || direction === 'right') {
           wrapper.style.top = `-${(wrapper.offsetHeight / 2) - (trigger.offsetHeight / 2)}px`;
-        } else {
-          wrapper.style.left = `${(trigger.offsetWidth / 2) - (wrapper.offsetWidth / 2)}px`;
+
+          break;
         }
+
+        // Stretch menu if it's original width larger than current parent width
+        if (parent.offsetWidth < initialWrapperWidth) {
+          wrapper.style.left = `0`;
+          wrapper.style.width = '100%';
+
+          break;
+        } else {
+          wrapper.style.width = `${initialWrapperWidth}px`;
+        }
+
+
+        // Check if element can not offset without overflowing viewport
+        if ((trigger.offsetWidth / 2) - (initialWrapperWidth / 2) < 0) {
+          wrapper.style.left = `0`;
+
+          break;
+        }
+
+        wrapper.style.left = `${(trigger.offsetWidth / 2) - (initialWrapperWidth / 2)}px`;
 
         break;
       }
@@ -128,7 +151,17 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
           // Align by top side of trigger
           wrapper.style.top = '0';
         } else {
-          wrapper.style.left = '0';
+          // Stretch menu if it's original width larger than current parent width
+          if (parent.offsetWidth < initialWrapperWidth) {
+            wrapper.style.left = `0`;
+            wrapper.style.width = '100%';
+
+            break;
+          } else {
+            wrapper.style.left = `0`;
+            wrapper.style.width = `${initialWrapperWidth}px`;
+          }
+
         }
 
         break;
@@ -139,7 +172,17 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
           // Align by bottom side of trigger
           wrapper.style.bottom = '0';
         } else {
-          wrapper.style.right = '0';
+          // Stretch menu if it's original width larger than current parent width
+          if (parent.offsetWidth < initialWrapperWidth) {
+            wrapper.style.right = `0`;
+            wrapper.style.width = '100%';
+
+            break;
+          } else {
+            wrapper.style.right = `0`;
+            wrapper.style.width = `${initialWrapperWidth}px`;
+          }
+
         }
 
         break;
@@ -152,7 +195,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
       isOpen,
       toggleMenu
     }}>
-      <div className={`fkw-menu ${isOpen ? 'fkw-menu--active' : ''} ${className ? className : ''}`} id={`fkw-menu--${ID}`}>
+      <div className={`fkw-menu ${settings.verbose ? 'fkw-menu--verbose' : ''} ${isOpen ? 'fkw-menu--active' : ''} ${className ? className : ''}`} id={`fkw-menu--${ID}`}>
         {children}
       </div>
     </MenuContext.Provider>

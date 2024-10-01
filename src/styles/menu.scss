@@ -2,9 +2,7 @@
   width: fit-content;
   position: relative;
 
-  &_trigger {
-    
-  }
+  &_trigger {}
 
   &_wrapper {
     position: absolute;
@@ -14,24 +12,22 @@
   &_content {
     width: fit-content;
   }
-}
 
-//
+  &--verbose {
+    background: red;
 
-.fkw-menu {
-  background: red;
+    .fkw-menu {
+      &_trigger {
+        background: green;
+      }
 
-  &_trigger {
-    background: green;
-    width: 300px;
-  }
+      &_wrapper {
+        background: blue;
+      }
 
-  &_wrapper {
-    background: blue;
-    width: 500px;
-  }
-
-  &_content {
-    background: yellow; 
+      &_content {
+        background: yellow;
+      }
+    }
   }
 }
