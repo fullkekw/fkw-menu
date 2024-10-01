@@ -3,6 +3,7 @@ import '../styles/menu.scss';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { IMenuContentProps, IMenuContextProps, IMenuProps, IMenuSettings, IMenuTriggerProps, IMenuWrapperProps, TMenuAlign, TMenuDirection } from "../interfaces/Menu";
 import { createID } from "./handlers";
+import cn from 'classnames';
 
 // @ts-ignore
 export const MenuContext = createContext<IMenuContextProps>();
@@ -17,6 +18,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
   settings.align = settings.align === undefined ? 'center' : settings.align;
   settings.direction = settings.direction === undefined ? 'bottom' : settings.direction;
   settings.verbose = settings.verbose === undefined ? false : settings.verbose;
+  settings.animation = settings.animation === undefined ? 'fade' : settings.animation;
   gap = gap == undefined ? 16 : gap;
 
 
@@ -50,18 +52,20 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 
   // Handle state
   useEffect(() => {
-    // const parent = document.querySelector(`#${ID}`);
+    const parent = document.querySelector(`#${ID}`);
 
-    // if (!parent) return console.error(`[fkw-menu]: Parent is not found`);
+    if (!parent) return console.error(`[fkw-menu]: Parent is not found`);
 
-    // const wrapper = parent.querySelector(`.fkw-menu_wrapper`) as HTMLDivElement;
-    // const triggers = parent.querySelectorAll(`.fkw-menu_trigger`) as NodeListOf<HTMLButtonElement>;
+    const wrapper = parent.querySelector(`.fkw-menu_wrapper`) as HTMLDivElement;
+    const triggers = parent.querySelectorAll(`.fkw-menu_trigger`) as NodeListOf<HTMLButtonElement>;
 
-    // if (!wrapper || !triggers.length) return console.error(`[fkw-menu]: Menu wrapper or triggers are not found`);
+    if (!wrapper || !triggers.length) return console.error(`[fkw-menu]: Menu wrapper or triggers are not found`);
 
     // const {align, direction} = settings;
 
     console.log(isOpen);
+
+    handleAnimation(isOpen);
 
     if (isOpen) {
 
@@ -190,12 +194,57 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
     }
   }
 
+  /** Animation handler */
+  function handleAnimation(isOpen: boolean) {
+    const parent = document.querySelector(`#fkw-menu--${ID}`);
+
+    // Pass if parent is undefined
+    if (!parent) return;
+
+    const trigger = parent.querySelector('.fkw-menu_trigger') as HTMLButtonElement | undefined;
+    const wrapper = parent.querySelector('.fkw-menu_wrapper') as HTMLDivElement | undefined;
+
+    if (!trigger || !wrapper) return console.warn(`[fkw-menu]: Wrapper or menu are not found`);
+
+    if (settings.animation === 'fade') {
+      return;
+    } else if (settings.animation === 'slide') {
+      switch (settings.direction) {
+        case 'bottom': {
+          wrapper.style.transform = `translateY(${isOpen ? '0px' : `-${gap}px`})`;
+
+          break;
+        }
+
+        case 'top': {
+          wrapper.style.transform = `translateY(${isOpen ? '0px' : `${gap}px`})`;
+
+          break;
+        }
+
+        case 'left': {
+          wrapper.style.transform = `translateX(${isOpen ? '0px' : `${gap}px`})`;
+
+          break;
+        }
+
+        case 'right': {
+          wrapper.style.transform = `translateX(${isOpen ? '0px' : `-${gap}px`})`;
+
+          break;
+        }
+      }
+    }
+  }
+
+
+
   return (
     <MenuContext.Provider value={{
       isOpen,
       toggleMenu
     }}>
-      <div className={`fkw-menu ${settings.verbose ? 'fkw-menu--verbose' : ''} ${isOpen ? 'fkw-menu--active' : ''} ${className ? className : ''}`} id={`fkw-menu--${ID}`}>
+      <div className={cn(`fkw-menu`, settings.verbose && 'fkw-menu--verbose', isOpen && 'fkw-menu--active', className)} id={`fkw-menu--${ID}`}>
         {children}
       </div>
     </MenuContext.Provider>
@@ -207,7 +256,7 @@ export const MenuTrigger: React.FC<IMenuTriggerProps> = ({ className, children, 
   const { toggleMenu, isOpen } = useContext(MenuContext);
 
   return (
-    <button className={`fkw-menu_trigger ${primary ? 'fkw-menu_trigger--primary' : ''} ${isOpen ? 'fkw-menu_trigger--active' : ''} ${className ? className : ''}`} tabIndex={0} onClick={() => { toggleMenu(); callback ? callback() : null; }}>
+    <button className={cn(`fkw-menu_trigger`, primary && 'fkw-menu_trigger--primary', isOpen && 'fkw-menu_trigger--active', className)} tabIndex={0} onClick={() => { toggleMenu(); callback ? callback() : null; }}>
       {children}
     </button>
   );
@@ -218,16 +267,7 @@ export const MenuWrapper: React.FC<IMenuWrapperProps> = ({ className, children }
   const { isOpen } = useContext(MenuContext);
 
   return (
-    <div className={`fkw-menu_wrapper ${isOpen ? 'fkw-menu_wrapper--active' : ''} ${className ? className : ''}`}>
-      {children}
-    </div>
-  );
-};
-
-/** Menu content */
-export const MenuContent: React.FC<IMenuContentProps> = ({ className, children }) => {
-  return (
-    <div className='fkw-menu_content'>
+    <div className={cn(`fkw-menu_wrapper`, isOpen && 'fkw-menu_wrapper--active', className)}>
       {children}
     </div>
   );

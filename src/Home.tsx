@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Menu, MenuContent, MenuTrigger, MenuWrapper } from "./components/Menu";
+import { Menu, MenuTrigger, MenuWrapper } from "./components/Menu";
 import { IMenuSettings, TMenuAlign } from "./interfaces/Menu";
 
 const Home: React.FC = () => {
   return (
     <div className="Home w-screen h-full min-h-screen bg-slate-500 p-[50px]">
-      <Menu className="w-full" settings={{ direction: 'bottom', align: 'center', verbose: true }}>
-        <MenuTrigger className="px-[24px]" primary>Trigger</MenuTrigger>
+      <Menu className="w-full" settings={{ direction: 'bottom', align: 'center', animation: 'slide', verbose: true }}>
+        <MenuTrigger className="w-full px-[24px]" primary>Trigger</MenuTrigger>
 
-        <MenuWrapper className="flex flex-col">
+        <MenuWrapper className="w-[200px] flex flex-col">
           {/* <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis ducimus maxime cumque deserunt tempora dolorem accusamus laudantium ipsum quod distinctio.</p> */}
           <p>hello</p>
           <p>hello</p>
@@ -16,7 +16,7 @@ const Home: React.FC = () => {
         </MenuWrapper>
       </Menu>
 
-      {/* <Menu>
+      {/* <Menu settings={{ verbose: true }}>
         <MenuTrigger primary>Trigger</MenuTrigger>
 
         <MenuWrapper>

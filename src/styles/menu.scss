@@ -7,6 +7,18 @@
   &_wrapper {
     position: absolute;
     display: flex;
+    transition: .2s ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    touch-action: none;
+    
+    &--active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      touch-action: auto;
+    }
   }
 
   &_content {
@@ -19,14 +31,26 @@
     .fkw-menu {
       &_trigger {
         background: green;
+
+        &--active {
+          background: rgba($color: #fff, $alpha: .7);
+        }
       }
 
       &_wrapper {
         background: blue;
+
+        &--active {
+          background: rgba($color: #fff, $alpha: .7);
+        }
       }
 
       &_content {
         background: yellow;
+
+        &--active {
+          background: rgba($color: #fff, $alpha: .7);
+        }
       }
     }
   }

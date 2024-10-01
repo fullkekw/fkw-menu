@@ -23,6 +23,11 @@ export interface IMenuSettings {
    * @default false
    */
   verbose?: boolean
+
+  /** Menu appearance animation
+   * @default 'fade'
+   */
+  animation?: 'fade' | 'slide'
 }
 
 
