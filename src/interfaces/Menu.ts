@@ -1,7 +1,10 @@
 import { ReactNode } from "react";
 
-export type TMenuDirection = 'top' | 'bottom' | 'left' | 'right'
-export type TMenuAlign = 'center' | 'left' | 'right' | 'stretch'
+export type TMenuDirection = 'top' | 'bottom' | 'left' | 'right';
+export type TMenuAlign = 'center' | 'left' | 'right' | 'stretch';
+export type TMenuAnimation = 'fade' | 'slide';
+export type TMenuCloseOn = 'outMenu' | 'both';
+export type TMenuStyles = 'none' | 'verbose' | 'pretty';
 
 export interface IMenuContextProps {
   isOpen: boolean
@@ -19,15 +22,22 @@ export interface IMenuSettings {
    */
   align?: TMenuAlign
 
-  /** Verbose mode will color elements offsets
-   * @default false
+  /** Menu default styles
+   * - Verbose - will show hitboxes
+   * - Pretty - will show pretty design
+   * @default 'none'
    */
-  verbose?: boolean
+  styles?: TMenuStyles
 
   /** Menu appearance animation
    * @default 'fade'
    */
-  animation?: 'fade' | 'slide'
+  animation?: TMenuAnimation
+
+  /** Close menu when clicked out of menu or out and inside
+   * @default 'outMenu'
+   */
+  closeOn?: TMenuCloseOn
 }
 
 

@@ -14,12 +14,15 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
   const [ID, setID] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
-  const settings = (sets === undefined ? {} : sets) as Required<IMenuSettings>;
-  settings.align = settings.align === undefined ? 'center' : settings.align;
-  settings.direction = settings.direction === undefined ? 'bottom' : settings.direction;
-  settings.verbose = settings.verbose === undefined ? false : settings.verbose;
-  settings.animation = settings.animation === undefined ? 'fade' : settings.animation;
-  gap = gap == undefined ? 16 : gap;
+  const settings = (sets !== undefined ? sets : {}) as Required<IMenuSettings>;
+
+  settings.align = settings.align !== undefined ? settings.align : 'center';
+  settings.direction = settings.direction !== undefined ? settings.direction : 'bottom';
+  settings.styles = settings.styles !== undefined ? settings.styles : 'none';
+  settings.animation = settings.animation !== undefined ? settings.animation : 'fade';
+  settings.closeOn = settings.closeOn !== undefined ? settings.closeOn : 'outMenu';
+
+  gap = gap !== undefined ? gap : 16;
 
 
 
@@ -52,7 +55,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 
   // Handle state
   useEffect(() => {
-    const parent = document.querySelector(`#${ID}`);
+    const parent = document.querySelector(`#fkw-menu--${ID}`);
 
     if (!parent) return console.error(`[fkw-menu]: Parent is not found`);
 
@@ -61,17 +64,57 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 
     if (!wrapper || !triggers.length) return console.error(`[fkw-menu]: Menu wrapper or triggers are not found`);
 
-    // const {align, direction} = settings;
+    const { animation, direction } = settings;
 
-    console.log(isOpen);
+    // Handle animation
+    if (animation === 'fade') {
+      return;
+    } else if (animation === 'slide') {
+      switch (direction) {
+        case 'bottom': {
+          wrapper.style.transform = `translateY(${isOpen ? '0px' : `-${gap}px`})`;
 
-    handleAnimation(isOpen);
+          break;
+        }
 
-    if (isOpen) {
+        case 'top': {
+          wrapper.style.transform = `translateY(${isOpen ? '0px' : `${gap}px`})`;
 
-    } else {
+          break;
+        }
 
+        case 'left': {
+          wrapper.style.transform = `translateX(${isOpen ? '0px' : `${gap}px`})`;
+
+          break;
+        }
+
+        case 'right': {
+          wrapper.style.transform = `translateX(${isOpen ? '0px' : `-${gap}px`})`;
+
+          break;
+        }
+      }
     }
+
+    // Handle click
+    function handleClick(e: MouseEvent) {
+      const self = e.target as HTMLElement | null;
+      if (!self) return toggleMenu();
+
+      // Close when clicked out of menu
+      const parent = self.closest(`#fkw-menu--${ID}`);
+      if (!parent) return toggleMenu();
+
+      // Close when clicked inside menu
+      if (settings.closeOn === 'both' && !self.classList.contains('fkw-menu_trigger')) return toggleMenu();
+    }
+
+    if (isOpen) window.addEventListener('click', handleClick);
+
+    return () => {
+      window.removeEventListener('click', handleClick);
+    };
   }, [isOpen]);
 
 
@@ -194,49 +237,6 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
     }
   }
 
-  /** Animation handler */
-  function handleAnimation(isOpen: boolean) {
-    const parent = document.querySelector(`#fkw-menu--${ID}`);
-
-    // Pass if parent is undefined
-    if (!parent) return;
-
-    const trigger = parent.querySelector('.fkw-menu_trigger') as HTMLButtonElement | undefined;
-    const wrapper = parent.querySelector('.fkw-menu_wrapper') as HTMLDivElement | undefined;
-
-    if (!trigger || !wrapper) return console.warn(`[fkw-menu]: Wrapper or menu are not found`);
-
-    if (settings.animation === 'fade') {
-      return;
-    } else if (settings.animation === 'slide') {
-      switch (settings.direction) {
-        case 'bottom': {
-          wrapper.style.transform = `translateY(${isOpen ? '0px' : `-${gap}px`})`;
-
-          break;
-        }
-
-        case 'top': {
-          wrapper.style.transform = `translateY(${isOpen ? '0px' : `${gap}px`})`;
-
-          break;
-        }
-
-        case 'left': {
-          wrapper.style.transform = `translateX(${isOpen ? '0px' : `${gap}px`})`;
-
-          break;
-        }
-
-        case 'right': {
-          wrapper.style.transform = `translateX(${isOpen ? '0px' : `-${gap}px`})`;
-
-          break;
-        }
-      }
-    }
-  }
-
 
 
   return (
@@ -244,7 +244,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
       isOpen,
       toggleMenu
     }}>
-      <div className={cn(`fkw-menu`, settings.verbose && 'fkw-menu--verbose', isOpen && 'fkw-menu--active', className)} id={`fkw-menu--${ID}`}>
+      <div className={cn(`fkw-menu`, settings.styles === 'verbose' && 'fkw-menu--verbose', settings.styles === 'pretty' && 'fkw-menu--pretty', isOpen && 'fkw-menu--active', className)} id={`fkw-menu--${ID}`}>
         {children}
       </div>
     </MenuContext.Provider>
@@ -267,7 +267,7 @@ export const MenuWrapper: React.FC<IMenuWrapperProps> = ({ className, children }
   const { isOpen } = useContext(MenuContext);
 
   return (
-    <div className={cn(`fkw-menu_wrapper`, isOpen && 'fkw-menu_wrapper--active', className)}>
+    <div className={cn(`fkw-menu_wrapper`, isOpen && 'fkw-menu_wrapper--active', className)} aria-hidden={!isOpen} role='menu'>
       {children}
     </div>
   );

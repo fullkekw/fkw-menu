@@ -5,7 +5,7 @@ import { IMenuSettings, TMenuAlign } from "./interfaces/Menu";
 const Home: React.FC = () => {
   return (
     <div className="Home w-screen h-full min-h-screen bg-slate-500 p-[50px]">
-      <Menu className="w-full" settings={{ direction: 'bottom', align: 'center', animation: 'slide', verbose: true }}>
+      <Menu className="w-full" settings={{ direction: 'bottom', align: 'center', animation: 'slide', styles: 'verbose' }}>
         <MenuTrigger className="w-full px-[24px]" primary>Trigger</MenuTrigger>
 
         <MenuWrapper className="w-[200px] flex flex-col">
