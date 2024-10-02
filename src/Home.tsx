@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Menu, MenuTrigger, MenuWrapper } from "./components/Menu";
-import { IMenuSettings, TMenuAlign } from "./interfaces/Menu";
+import { Menu, MenuTrigger, MenuWrapper, IMenuSettings } from "../index";
 
 const Home: React.FC = () => {
   const [state, setState] = useState(true);
 
-  useEffect(() => console.log(state), [state])
+  useEffect(() => console.log(state), [state]);
 
   return (
     <div className="Home w-screen h-full min-h-screen bg-slate-500 p-[50px]">

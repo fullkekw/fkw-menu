@@ -1,16 +1,17 @@
 import { ReactNode } from "react";
 
+export interface IMenuContextProps {
+  isOpen: boolean
+  toggleMenu: () => void
+}
+
 export type TMenuDirection = 'top' | 'bottom' | 'left' | 'right';
 export type TMenuAlign = 'center' | 'left' | 'right' | 'stretch';
 export type TMenuAnimation = 'fade' | 'slide';
 export type TMenuCloseOn = 'outMenu' | 'both';
 export type TMenuStyles = 'none' | 'verbose' | 'pretty';
 
-export interface IMenuContextProps {
-  isOpen: boolean
-  toggleMenu: () => void
-}
-
+/** Menu settings */
 export interface IMenuSettings {
   /** Menu direction from trigger
    * @default 'bottom'
@@ -42,6 +43,7 @@ export interface IMenuSettings {
 
 
 
+/** Menu component props */
 export interface IMenuProps {
   children: ReactNode
 
@@ -61,6 +63,7 @@ export interface IMenuProps {
   stateSetter?: (state: boolean) => void
 }
 
+/** MenuTrigger component props */
 export interface IMenuTriggerProps {
   children: ReactNode
 
@@ -74,6 +77,7 @@ export interface IMenuTriggerProps {
   primary?: boolean
 }
 
+/** MenuWrapper component props */
 export interface IMenuWrapperProps {
   className?: string
   children: ReactNode

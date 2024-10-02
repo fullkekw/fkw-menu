@@ -124,7 +124,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 
   // Sync inner state
   useEffect(() => {
-    if (stateSetter && state !== undefined) setIsOpen(state === isOpen ? !state : state)
+    if (stateSetter && state !== undefined) setIsOpen(state === isOpen ? !state : state);
   }, [state]);
 
 
