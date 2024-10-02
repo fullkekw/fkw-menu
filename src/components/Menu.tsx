@@ -1,7 +1,7 @@
 import '../styles/menu.scss';
 
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { IMenuContentProps, IMenuContextProps, IMenuProps, IMenuSettings, IMenuTriggerProps, IMenuWrapperProps, TMenuAlign, TMenuDirection } from "../interfaces/Menu";
+import { IMenuContextProps, IMenuProps, IMenuSettings, IMenuTriggerProps, IMenuWrapperProps, TMenuAlign, TMenuDirection } from "../interfaces/Menu";
 import { createID } from "./handlers";
 import cn from 'classnames';
 
@@ -10,7 +10,7 @@ export const MenuContext = createContext<IMenuContextProps>();
 
 
 /** Menu container */
-export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets, gap }) => {
+export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets, gap, disabled, state, stateSetter }) => {
   const [ID, setID] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
@@ -37,7 +37,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 
     const wrapper = parent.querySelector(`.fkw-menu_wrapper`) as HTMLDivElement | undefined;
     const trigger = parent.querySelector(`.fkw-menu_trigger--primary`) as HTMLButtonElement | undefined;
-    if (!wrapper || !trigger) return console.error(`[fkw-menu]: Menu wrapper or trigger are not found`);
+    if (!wrapper || !trigger) return console.error(`[fkw-menu]: Menu wrapper or primary trigger are not found`);
 
     const { align, direction } = settings;
 
@@ -117,10 +117,20 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
     };
   }, [isOpen]);
 
+  // Sync outer state
+  useEffect(() => {
+    if (stateSetter && state === undefined) stateSetter(isOpen);
+  }, [isOpen]);
+
+  // Sync inner state
+  useEffect(() => {
+    if (stateSetter && state !== undefined) setIsOpen(state === isOpen ? !state : state)
+  }, [state]);
+
 
 
   function toggleMenu() {
-    setIsOpen(!isOpen);
+    if (!disabled) setIsOpen(!isOpen);
   }
 
   function calculateDirection(direction: TMenuDirection, gap: number, wrapper: HTMLDivElement, trigger: HTMLButtonElement) {
@@ -252,11 +262,11 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 };
 
 /** Menu trigger */
-export const MenuTrigger: React.FC<IMenuTriggerProps> = ({ className, children, callback, primary }) => {
+export const MenuTrigger: React.FC<IMenuTriggerProps> = ({ className, children, callback, primary, disabled }) => {
   const { toggleMenu, isOpen } = useContext(MenuContext);
 
   return (
-    <button className={cn(`fkw-menu_trigger`, primary && 'fkw-menu_trigger--primary', isOpen && 'fkw-menu_trigger--active', className)} tabIndex={0} onClick={() => { toggleMenu(); callback ? callback() : null; }}>
+    <button className={cn(`fkw-menu_trigger`, primary && 'fkw-menu_trigger--primary', isOpen && 'fkw-menu_trigger--active', className)} tabIndex={0} onClick={() => { toggleMenu(); callback ? callback() : null; }} disabled={Boolean(disabled)}>
       {children}
     </button>
   );

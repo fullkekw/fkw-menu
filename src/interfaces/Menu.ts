@@ -43,33 +43,38 @@ export interface IMenuSettings {
 
 
 export interface IMenuProps {
-  className?: string
   children: ReactNode
+
+  className?: string
   settings?: IMenuSettings
+  disabled?: boolean
 
   /** Gap between primary trigger and menu
    * @default 16
    */
   gap?: number
+
+  /** Sync out state with current menu state */
+  state?: boolean
+
+  /** Sync out state with current menu state */
+  stateSetter?: (state: boolean) => void
 }
 
 export interface IMenuTriggerProps {
-  className?: string
   children: ReactNode
+
+  className?: string
+  disabled?: boolean
 
   /** Onclick callback */
   callback?: () => void
 
   /** Defines main element for positioning menu */
-  primary: boolean
+  primary?: boolean
 }
 
 export interface IMenuWrapperProps {
-  className?: string
-  children: ReactNode
-}
-
-export interface IMenuContentProps {
   className?: string
   children: ReactNode
 }
