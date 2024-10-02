@@ -1,23 +1,29 @@
 {
   "name": "@fullkekw/fkw-menu",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "React menu (dropdown) component written on Typescript.",
   "keywords": ["fkw", "fullkekw", "menu", "dropdown", "react menu", "react dropdown"],
   "license": "MIT",
   "author": "unniiiverse",
   "type": "module",
-  "main": "dist/index.umd.js",
-  "module": "dist/index.d.ts",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.es.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.umd.js"
+      }
     },
     "./css": "./dist/style.css"
   },
   "files": [
-    "/dist/**/*.*"
+    "dist/**/*.*"
   ],
   "scripts": {
     "dev": "eslint . --fix --ext .ts,.tsx && vite",

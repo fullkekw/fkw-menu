@@ -1,4 +1,4 @@
-![cover](./cover.png)
+![cover](https://github.com/fullkekw/fkw-menu/raw/main/cover.png)
 
 React menu (dropdown) component written on Typescript. Compatible with Next & Vite!
 

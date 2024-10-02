@@ -44,11 +44,11 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
     let initialWrapperWidth = wrapper.offsetWidth;
 
     window.addEventListener('resize', () => {
-      calculateDirection(direction, gap, wrapper, trigger);
+      calculateDirection(direction, gap || 16, wrapper, trigger);
       calculateAlignment({ align, direction, initialWrapperWidth, wrapper, trigger, parent });
     });
 
-    calculateDirection(direction, gap, wrapper, trigger);
+    calculateDirection(direction, gap || 16, wrapper, trigger);
     calculateAlignment({ align, direction, initialWrapperWidth, wrapper, trigger, parent });
 
   }, []);
