@@ -28,8 +28,6 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
     if (!instanceId) setID(createID())
   }, [])
 
-  useEffect(() => console.log(ID), [ID]);
-
   useEffect(() => {
     const parent = document.querySelector(`#fkw-menu--${ID}`) as HTMLDivElement | undefined;
     if (!parent) throw new EFKW(`Parent is not found`);
