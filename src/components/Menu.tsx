@@ -1,8 +1,8 @@
 import '../styles/menu.scss';
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useId, useMemo, useRef, useState } from "react";
 import { IMenuContextProps, IMenuProps, IMenuSettings, IMenuTriggerProps, IMenuWrapperProps, TMenuAlign, TMenuDirection } from "../interfaces/Menu";
-import { createID } from "./handlers";
+import { createID, EFKW } from "./handlers";
 import cn from 'classnames';
 
 // @ts-ignore
@@ -10,8 +10,8 @@ export const MenuContext = createContext<IMenuContextProps>();
 
 
 /** Menu container */
-export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets, gap, disabled, state, stateSetter }) => {
-  const [ID, setID] = useState('');
+export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets, gap, disabled, state, stateSetter, instanceId }) => {
+  const [ID, setID] = useState(instanceId);
   const [isOpen, setIsOpen] = useState(false);
 
   const settings = (sets !== undefined ? sets : {}) as Required<IMenuSettings>;
@@ -24,20 +24,19 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 
   gap = gap !== undefined ? gap : 16;
 
-
-
-  // Create ID
   useMemo(() => {
-    setID(createID());
-  }, []);
+    if (!instanceId) setID(createID())
+  }, [])
+
+  useEffect(() => console.log(ID), [ID]);
 
   useEffect(() => {
     const parent = document.querySelector(`#fkw-menu--${ID}`) as HTMLDivElement | undefined;
-    if (!parent) return console.error(`[fkw-menu]: Parent is not found`);
+    if (!parent) throw new EFKW(`Parent is not found`);
 
     const wrapper = parent.querySelector(`.fkw-menu_wrapper`) as HTMLDivElement | undefined;
     const trigger = parent.querySelector(`.fkw-menu_trigger--primary`) as HTMLButtonElement | undefined;
-    if (!wrapper || !trigger) return console.error(`[fkw-menu]: Menu wrapper or primary trigger are not found`);
+    if (!wrapper || !trigger) throw new EFKW(`Menu wrapper or primary trigger are not found`);
 
     const { align, direction } = settings;
 
@@ -50,19 +49,18 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 
     calculateDirection(direction, gap || 16, wrapper, trigger);
     calculateAlignment({ align, direction, initialWrapperWidth, wrapper, trigger, parent });
-
   }, []);
 
   // Handle state
   useEffect(() => {
     const parent = document.querySelector(`#fkw-menu--${ID}`);
 
-    if (!parent) return console.error(`[fkw-menu]: Parent is not found`);
+    if (!parent) throw new EFKW(`Parent is not found`);
 
     const wrapper = parent.querySelector(`.fkw-menu_wrapper`) as HTMLDivElement;
     const triggers = parent.querySelectorAll(`.fkw-menu_trigger`) as NodeListOf<HTMLButtonElement>;
 
-    if (!wrapper || !triggers.length) return console.error(`[fkw-menu]: Menu wrapper or triggers are not found`);
+    if (!wrapper || !triggers.length) throw new EFKW(`Menu wrapper or triggers are not found`);
 
     const { animation, direction } = settings;
 
