@@ -25,8 +25,8 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
   gap = gap !== undefined ? gap : 16;
 
   useMemo(() => {
-    if (!instanceId) setID(createID())
-  }, [])
+    if (!instanceId) setID(createID());
+  }, []);
 
   useEffect(() => {
     const parent = document.querySelector(`#fkw-menu--${ID}`) as HTMLDivElement | undefined;
@@ -113,20 +113,28 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
     };
   }, [isOpen]);
 
-  // Sync outer state
-  useEffect(() => {
-    if (stateSetter && state === undefined) stateSetter(isOpen);
-  }, [isOpen]);
-
   // Sync inner state
   useEffect(() => {
-    if (stateSetter && state !== undefined) setIsOpen(state === isOpen ? !state : state);
+    if (state === undefined) return;
+
+    setIsOpen(state);
   }, [state]);
 
 
 
   function toggleMenu() {
-    if (!disabled) setIsOpen(!isOpen);
+    if (disabled) return;
+
+    const to = !isOpen;
+
+    if (stateSetter !== undefined && state !== undefined) {
+      stateSetter(to); // Change inner state
+    } else if (stateSetter !== undefined && state === undefined) {
+      stateSetter(to); // Change out state
+      setIsOpen(to); // Change inner state
+    } else {
+      setIsOpen(to); // Change inner state
+    }
   }
 
   function calculateDirection(direction: TMenuDirection, gap: number, wrapper: HTMLDivElement, trigger: HTMLButtonElement) {
