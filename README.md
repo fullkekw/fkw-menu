@@ -124,7 +124,7 @@ export interface IMenuProps {
   className?: string
   settings?: IMenuSettings
   disabled?: boolean
-  instanceId?: string
+  id?: string
 
   /** Gap between primary trigger and menu
    * @default 16

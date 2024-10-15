@@ -2,7 +2,7 @@ import '../styles/menu.scss';
 
 import { createContext, useContext, useEffect, useId, useMemo, useRef, useState } from "react";
 import { IMenuContextProps, IMenuProps, IMenuSettings, IMenuTriggerProps, IMenuWrapperProps, TMenuAlign, TMenuDirection } from "../interfaces/Menu";
-import { createID, EFKW } from "./handlers";
+import { EFKW } from "./handlers";
 import cn from 'classnames';
 
 // @ts-ignore
@@ -10,9 +10,10 @@ export const MenuContext = createContext<IMenuContextProps>();
 
 
 /** Menu container */
-export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets, gap, disabled, state, stateSetter, instanceId }) => {
-  const [ID, setID] = useState(instanceId);
+export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets, gap, disabled, state, stateSetter, id }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const settings = (sets !== undefined ? sets : {}) as Required<IMenuSettings>;
 
@@ -24,13 +25,11 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 
   gap = gap !== undefined ? gap : 16;
 
-  useMemo(() => {
-    if (!instanceId) setID(createID());
-  }, []);
+
 
   useEffect(() => {
-    const parent = document.querySelector(`#fkw-menu--${ID}`) as HTMLDivElement | undefined;
-    if (!parent) throw new EFKW(`Parent is not found`);
+    const parent = parentRef.current;
+    if (!parent) throw new EFKW(`Menu parent is not found`);
 
     const wrapper = parent.querySelector(`.fkw-menu_wrapper`) as HTMLDivElement | undefined;
     const trigger = parent.querySelector(`.fkw-menu_trigger--primary`) as HTMLButtonElement | undefined;
@@ -51,9 +50,8 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 
   // Handle state
   useEffect(() => {
-    const parent = document.querySelector(`#fkw-menu--${ID}`);
-
-    if (!parent) throw new EFKW(`Parent is not found`);
+    const parent = parentRef.current;
+    if (!parent) throw new EFKW(`Menu parent is not found`);
 
     const wrapper = parent.querySelector(`.fkw-menu_wrapper`) as HTMLDivElement;
     const triggers = parent.querySelectorAll(`.fkw-menu_trigger`) as NodeListOf<HTMLButtonElement>;
@@ -99,7 +97,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
       if (!self) return toggleMenu();
 
       // Close when clicked out of menu
-      const parent = self.closest(`#fkw-menu--${ID}`);
+      const parent = self.closest(`.fkw-menu`);
       if (!parent) return toggleMenu();
 
       // Close when clicked inside menu
@@ -256,9 +254,10 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
   return (
     <MenuContext.Provider value={{
       isOpen,
+      parentRef,
       toggleMenu
     }}>
-      <div className={cn(`fkw-menu`, settings.styles === 'verbose' && 'fkw-menu--verbose', settings.styles === 'pretty' && 'fkw-menu--pretty', isOpen && 'fkw-menu--active', className)} id={`fkw-menu--${ID}`}>
+      <div className={cn(`fkw-menu`, settings.styles === 'verbose' && 'fkw-menu--verbose', settings.styles === 'pretty' && 'fkw-menu--pretty', isOpen && 'fkw-menu--active', className)} id={id} ref={parentRef}>
         {children}
       </div>
     </MenuContext.Provider>

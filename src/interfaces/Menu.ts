@@ -1,7 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode, RefObject } from "react";
 
 export interface IMenuContextProps {
   isOpen: boolean
+  parentRef: RefObject<HTMLDivElement>
   toggleMenu: () => void
 }
 
@@ -50,7 +51,7 @@ export interface IMenuProps {
   className?: string
   settings?: IMenuSettings
   disabled?: boolean
-  instanceId?: string
+  id?: string
 
   /** Gap between primary trigger and menu
    * @default 16
