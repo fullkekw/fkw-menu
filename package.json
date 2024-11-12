@@ -48,7 +48,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
     "postcss": "^8.4.31",
-    "react-dom": "^18.3.1",
+    "react-dom": "19.0.0-rc-2ec26bc4-20241111",
     "react-router-dom": "^6.24.0",
     "sass": "^1.69.5",
     "tailwindcss": "^3.3.5",
@@ -58,6 +58,6 @@
   },
   "dependencies": {
     "classnames": "^2.5.1",
-    "react": "^18.3.1"
+    "react": "19.0.0-rc-2ec26bc4-20241111"
   }
 }
