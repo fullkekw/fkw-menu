@@ -29,7 +29,7 @@ const Home: React.FC = () => {
   return (
     <div className="Home w-screen h-full min-h-screen bg-slate-500 p-[50px]">
       <Menu stateSetter={setState}>
-        {/* At least one trigger must have priority={true}. Menu will be positioned relatively this trigger */}
+        {/* At least one trigger must be primary. Menu will be positioned relatively this trigger */}
         <MenuTrigger primary>Trigger</MenuTrigger>
         <MenuTrigger>Trigger</MenuTrigger>
 

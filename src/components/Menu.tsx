@@ -1,8 +1,8 @@
 import '../styles/menu.scss';
 
-import { createContext, useContext, useEffect, useId, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { IMenuContextProps, IMenuProps, IMenuSettings, IMenuTriggerProps, IMenuWrapperProps, TMenuAlign, TMenuDirection } from "../interfaces/Menu";
-import { EFKW } from "./handlers";
+import { createStringID, EFKW } from "./handlers";
 import cn from 'classnames';
 
 // @ts-ignore
@@ -11,19 +11,20 @@ export const MenuContext = createContext<IMenuContextProps>();
 
 /** Menu container */
 export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets, gap, disabled, state, stateSetter, id }) => {
+  const settings = (sets !== undefined ? sets : {}) as Required<IMenuSettings>;
+
   const [isOpen, setIsOpen] = useState(false);
+  const [ID] = useState(id ?? `fkw-${createStringID(6)}`);
 
   const parentRef = useRef<HTMLDivElement>(null);
 
-  const settings = (sets !== undefined ? sets : {}) as Required<IMenuSettings>;
+  settings.align = settings.align ?? 'center';
+  settings.direction = settings.direction ?? 'bottom';
+  settings.styles = settings.styles ?? 'none';
+  settings.animation = settings.animation ?? 'fade';
+  settings.closeOn = settings.closeOn ?? 'outMenu';
 
-  settings.align = settings.align !== undefined ? settings.align : 'center';
-  settings.direction = settings.direction !== undefined ? settings.direction : 'bottom';
-  settings.styles = settings.styles !== undefined ? settings.styles : 'none';
-  settings.animation = settings.animation !== undefined ? settings.animation : 'fade';
-  settings.closeOn = settings.closeOn !== undefined ? settings.closeOn : 'outMenu';
-
-  gap = gap !== undefined ? gap : 16;
+  gap = gap ?? 16;
 
 
 
@@ -48,7 +49,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
     calculateAlignment({ align, direction, initialWrapperWidth, wrapper, trigger, parent });
   }, []);
 
-  // Handle state
+  // Handle states
   useEffect(() => {
     const parent = parentRef.current;
     if (!parent) throw new EFKW(`Menu parent is not found`);
@@ -61,9 +62,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
     const { animation, direction } = settings;
 
     // Handle animation
-    if (animation === 'fade') {
-      return;
-    } else if (animation === 'slide') {
+    if (animation === 'slide') {
       switch (direction) {
         case 'bottom': {
           wrapper.style.transform = `translateY(${isOpen ? '0px' : `-${gap}px`})`;
@@ -96,12 +95,12 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
       const self = e.target as HTMLElement | null;
       if (!self) return toggleMenu();
 
-      // Close when clicked out of menu
-      const parent = self.closest(`.fkw-menu`);
-      if (!parent) return toggleMenu();
+      const parent = self.closest(`#${ID}`);
 
-      // Close when clicked inside menu
-      if (settings.closeOn === 'both' && !self.classList.contains('fkw-menu_trigger')) return toggleMenu();
+      // Close menu if parent not found (outside menu)
+      if (settings.closeOn === 'outMenu' && !parent) toggleMenu();
+      // Close menu when clicked anywhere (also if inside menu)
+      if (settings.closeOn === 'both') toggleMenu();
     }
 
     if (isOpen) window.addEventListener('click', handleClick);
@@ -257,7 +256,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
       parentRef,
       toggleMenu
     }}>
-      <div className={cn(`fkw-menu`, settings.styles === 'verbose' && 'fkw-menu--verbose', settings.styles === 'pretty' && 'fkw-menu--pretty', isOpen && 'fkw-menu--active', className)} id={id} ref={parentRef}>
+      <div className={cn(`fkw-menu`, settings.styles === 'verbose' && 'fkw-menu--verbose', settings.styles === 'pretty' && 'fkw-menu--pretty', isOpen && 'fkw-menu--active', className)} id={ID} ref={parentRef}>
         {children}
       </div>
     </MenuContext.Provider>
