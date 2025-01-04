@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Menu, MenuTrigger, MenuWrapper, IMenuSettings } from "../index";
+import { Menu, MenuTrigger, MenuWrapper, } from "./_package/index";
 
 const Home: React.FC = () => {
   const [state, setState] = useState(true);

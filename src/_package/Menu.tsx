@@ -1,8 +1,8 @@
-import '../styles/menu.scss';
+import './styles.scss';
 
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { IMenuContextProps, IMenuProps, IMenuSettings, IMenuTriggerProps, IMenuWrapperProps, TMenuAlign, TMenuDirection } from "../interfaces/Menu";
-import { createStringID, EFKW } from "./handlers";
+import { IMenuContextProps, IMenuProps, IMenuSettings, IMenuTriggerProps, IMenuWrapperProps, TMenuAlign, TMenuDirection } from "./Interfaces";
+import { createStringID, EFKW } from "../components/handlers";
 import cn from 'classnames';
 
 // @ts-ignore
@@ -10,7 +10,7 @@ export const MenuContext = createContext<IMenuContextProps>();
 
 
 /** Menu container */
-export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets, gap, disabled, state, stateSetter, id }) => {
+export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets, gap: gapRaw, disabled, state, stateSetter, id }) => {
   const settings = (sets !== undefined ? sets : {}) as Required<IMenuSettings>;
 
   const [isOpen, setIsOpen] = useState(false);
@@ -18,13 +18,13 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 
   const parentRef = useRef<HTMLDivElement>(null);
 
+  const gap = gapRaw ?? 16;
   settings.align = sets?.align ?? 'center';
   settings.direction = sets?.direction ?? 'bottom';
   settings.verbose = sets?.verbose ?? false;
   settings.animation = sets?.animation ?? 'fade';
   settings.closeOn = sets?.closeOn ?? 'outMenu';
 
-  gap = gap ?? 16;
 
 
 
