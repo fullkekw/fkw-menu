@@ -7,10 +7,9 @@ export interface IMenuContextProps {
 }
 
 export type TMenuDirection = 'top' | 'bottom' | 'left' | 'right';
-export type TMenuAlign = 'center' | 'left' | 'right' | 'stretch';
+export type TMenuAlign = 'center' | 'start' | 'end' | 'stretch';
 export type TMenuAnimation = 'fade' | 'slide';
 export type TMenuCloseOn = 'outMenu' | 'both';
-export type TMenuStyles = 'none' | 'verbose' | 'pretty';
 
 /** Menu settings */
 export interface IMenuSettings {
@@ -20,16 +19,11 @@ export interface IMenuSettings {
   direction?: TMenuDirection
 
   /** Menu alignment to trigger
+   * @param start Left/top side of anchor
+   * @param end Right/bottom side of anchor
    * @default 'center'
    */
   align?: TMenuAlign
-
-  /** Menu default styles
-   * - Verbose - will show hitboxes
-   * - Pretty - will show pretty design
-   * @default 'none'
-   */
-  styles?: TMenuStyles
 
   /** Menu appearance animation
    * @default 'fade'
@@ -40,8 +34,10 @@ export interface IMenuSettings {
    * @default 'outMenu'
    */
   closeOn?: TMenuCloseOn
-}
 
+  /** Verbose mode */
+  verbose?: boolean
+}
 
 
 /** Menu component props */
@@ -75,8 +71,8 @@ export interface IMenuTriggerProps {
   /** Onclick callback */
   callback?: () => void
 
-  /** Defines main element for positioning menu */
-  primary?: boolean
+  /** Defines main element for positioning menu. At least one must be present */
+  anchor?: boolean
 }
 
 /** MenuWrapper component props */

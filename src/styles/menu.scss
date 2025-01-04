@@ -13,6 +13,7 @@
     pointer-events: none;
     touch-action: none;
     z-index: 99;
+    width: fit-content;
     
     &--active {
       opacity: 1;

@@ -29,8 +29,8 @@ const Home: React.FC = () => {
   return (
     <div className="Home w-screen h-full min-h-screen bg-slate-500 p-[50px]">
       <Menu stateSetter={setState}>
-        {/* At least one trigger must be primary. Menu will be positioned relatively this trigger */}
-        <MenuTrigger primary>Trigger</MenuTrigger>
+        {/* At least one trigger must be anchor. Menu will be positioned relatively this element */}
+        <MenuTrigger anchor>Trigger</MenuTrigger>
         <MenuTrigger>Trigger</MenuTrigger>
 
         <MenuWrapper>
@@ -46,7 +46,7 @@ const Home: React.FC = () => {
 export default Home;
 ```
 
-Menu will appear at top-right corner of **primary** trigger with **verbose** styles and **slide** animation
+Menu will appear at top-right corner of **anchor** trigger in **verbose** mode and **slide** animation
 ```tsx
 import '@fullkekw/fkw-menu/css';
 import React, { useEffect, useState } from "react";
@@ -61,8 +61,8 @@ const Home: React.FC = () => {
     <div className="Home w-screen h-full min-h-screen bg-slate-500 p-[50px]">
       <button onClick={() => setState(prev => !prev)}>Change state out of component</button>
 
-      <Menu settings={{ direction: 'top', align: 'right', animation: 'slide', styles: 'verbose' }} state={state} stateSetter={setState}>
-        <MenuTrigger primary>Trigger</MenuTrigger>
+      <Menu settings={{ direction: 'top', align: 'end', animation: 'slide', verbose: true }} state={state} stateSetter={setState}>
+        <MenuTrigger anchor>Trigger</MenuTrigger>
 
         <MenuWrapper>
           <p>Item_1</p>
@@ -80,10 +80,9 @@ export default Home;
 ## API
 ```ts
 export type TMenuDirection = 'top' | 'bottom' | 'left' | 'right';
-export type TMenuAlign = 'center' | 'left' | 'right' | 'stretch';
+export type TMenuAlign = 'center' | 'start' | 'end' | 'stretch';
 export type TMenuAnimation = 'fade' | 'slide';
 export type TMenuCloseOn = 'outMenu' | 'both';
-export type TMenuStyles = 'none' | 'verbose' | 'pretty';
 
 /** Menu settings */
 export interface IMenuSettings {
@@ -93,16 +92,11 @@ export interface IMenuSettings {
   direction?: TMenuDirection
 
   /** Menu alignment to trigger
+   * @param start Left/top side of anchor
+   * @param end Right/bottom side of anchor
    * @default 'center'
    */
   align?: TMenuAlign
-
-  /** Menu default styles
-   * - Verbose - will show hitboxes
-   * - Pretty - will show pretty design
-   * @default 'none'
-   */
-  styles?: TMenuStyles
 
   /** Menu appearance animation
    * @default 'fade'
@@ -113,9 +107,10 @@ export interface IMenuSettings {
    * @default 'outMenu'
    */
   closeOn?: TMenuCloseOn
+
+  /** Verbose mode */
+  verbose?: boolean
 }
-
-
 
 /** Menu component props */
 export interface IMenuProps {
@@ -148,8 +143,8 @@ export interface IMenuTriggerProps {
   /** Onclick callback */
   callback?: () => void
 
-  /** Defines main element for positioning menu */
-  primary?: boolean
+  /** Defines main element for positioning menu. At least one must be present */
+  anchor?: boolean
 }
 
 /** MenuWrapper component props */
@@ -163,12 +158,12 @@ export interface IMenuWrapperProps {
 ## Installation
 Using npm
 ```
-npm i @fullkekw/fkw-menu
+npm install @fullkekw/fkw-menu
 ```
 
 Using pnpm
 ```
-pnpm i @fullkekw/fkw-menu
+pnpm install @fullkekw/fkw-menu
 ```
 
 Using yarn
@@ -177,4 +172,4 @@ yatn add @fullkekw/fkw-menu
 ```
 
 Licensed under MIT <br>
-fullkekw © 2023 - 2024
+fullkekw © 2023 - 2025

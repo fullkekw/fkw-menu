@@ -18,79 +18,63 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 
   const parentRef = useRef<HTMLDivElement>(null);
 
-  settings.align = settings.align ?? 'center';
-  settings.direction = settings.direction ?? 'bottom';
-  settings.styles = settings.styles ?? 'none';
-  settings.animation = settings.animation ?? 'fade';
-  settings.closeOn = settings.closeOn ?? 'outMenu';
+  settings.align = sets?.align ?? 'center';
+  settings.direction = sets?.direction ?? 'bottom';
+  settings.verbose = sets?.verbose ?? false;
+  settings.animation = sets?.animation ?? 'fade';
+  settings.closeOn = sets?.closeOn ?? 'outMenu';
 
   gap = gap ?? 16;
 
 
 
+  // Init
   useEffect(() => {
     const parent = parentRef.current;
-    if (!parent) throw new EFKW(`Menu parent is not found`);
+    if (!parent) throw new EFKW(`Menu ref is not found`);
 
     const wrapper = parent.querySelector(`.fkw-menu_wrapper`) as HTMLDivElement | undefined;
-    const trigger = parent.querySelector(`.fkw-menu_trigger--primary`) as HTMLButtonElement | undefined;
-    if (!wrapper || !trigger) throw new EFKW(`Menu wrapper or primary trigger are not found`);
+    if (!wrapper) throw new EFKW(`MenuWrapper must be present inside Menu component`);
 
+    const triggers = parent.querySelectorAll(`.fkw-menu_trigger--anchor`) as NodeListOf<HTMLButtonElement>;
+    if (!triggers.length) throw new EFKW(`Anchor (anchor={true}) MenuTrigger must be present inside Menu component`);
+    if (triggers.length > 1) throw new EFKW(`Anchor (anchor={true}) MenuTrigger must be only one inside Menu component`);
+
+    const trigger = triggers[0];
     const { align, direction } = settings;
 
-    let initialWrapperWidth = wrapper.offsetWidth;
+    const calcDirs = () => calculateDirection(direction, gap, wrapper, trigger);
+    const calcAlign = () => calculateAlignment({ align, direction, wrapper, trigger });
 
-    window.addEventListener('resize', () => {
-      calculateDirection(direction, gap || 16, wrapper, trigger);
-      calculateAlignment({ align, direction, initialWrapperWidth, wrapper, trigger, parent });
-    });
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', () => {
+        calcDirs();
+        calcAlign();
+      });
+    }
 
-    calculateDirection(direction, gap || 16, wrapper, trigger);
-    calculateAlignment({ align, direction, initialWrapperWidth, wrapper, trigger, parent });
+    calcDirs();
+    calcAlign();
   }, []);
 
   // Handle states
   useEffect(() => {
-    const parent = parentRef.current;
-    if (!parent) throw new EFKW(`Menu parent is not found`);
-
+    const parent = parentRef.current as HTMLDivElement;
     const wrapper = parent.querySelector(`.fkw-menu_wrapper`) as HTMLDivElement;
-    const triggers = parent.querySelectorAll(`.fkw-menu_trigger`) as NodeListOf<HTMLButtonElement>;
-
-    if (!wrapper || !triggers.length) throw new EFKW(`Menu wrapper or triggers are not found`);
 
     const { animation, direction } = settings;
 
-    // Handle animation
+    //* Handle animation
     if (animation === 'slide') {
-      switch (direction) {
-        case 'bottom': {
-          wrapper.style.transform = `translateY(${isOpen ? '0px' : `-${gap}px`})`;
-
-          break;
-        }
-
-        case 'top': {
-          wrapper.style.transform = `translateY(${isOpen ? '0px' : `${gap}px`})`;
-
-          break;
-        }
-
-        case 'left': {
-          wrapper.style.transform = `translateX(${isOpen ? '0px' : `${gap}px`})`;
-
-          break;
-        }
-
-        case 'right': {
-          wrapper.style.transform = `translateX(${isOpen ? '0px' : `-${gap}px`})`;
-
-          break;
-        }
-      }
+      if (direction === 'bottom') wrapper.style.transform = `translateY(${isOpen ? '0px' : `-${gap}px`})`;
+      if (direction === 'top') wrapper.style.transform = `translateY(${isOpen ? '0px' : `${gap}px`})`;
+      if (direction === 'left') wrapper.style.transform = `translateX(${isOpen ? '0px' : `${gap}px`})`;
+      if (direction === 'right') wrapper.style.transform = `translateX(${isOpen ? '0px' : `-${gap}px`})`;
     }
 
-    // Handle click
+
+
+    //* Handle click
     function handleClick(e: MouseEvent) {
       const self = e.target as HTMLElement | null;
       if (!self) return toggleMenu();
@@ -103,14 +87,18 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
       if (settings.closeOn === 'both') toggleMenu();
     }
 
-    if (isOpen) window.addEventListener('click', handleClick);
+
+
+    if (isOpen && typeof window !== 'undefined') window.addEventListener('click', handleClick);
 
     return () => {
-      window.removeEventListener('click', handleClick);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('click', handleClick);
+      }
     };
   }, [isOpen]);
 
-  // Sync inner state
+  //* Sync inner state when out changed
   useEffect(() => {
     if (state === undefined) return;
 
@@ -125,126 +113,45 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
     const to = !isOpen;
 
     if (stateSetter !== undefined && state !== undefined) {
-      stateSetter(to); // Change inner state
+      //* Sync only out state with inner
+      stateSetter(to);
     } else if (stateSetter !== undefined && state === undefined) {
-      stateSetter(to); // Change out state
-      setIsOpen(to); // Change inner state
+      //* Sync both states
+      stateSetter(to);
+      setIsOpen(to);
     } else {
-      setIsOpen(to); // Change inner state
+      //* Sync only inner state with out
+      setIsOpen(to);
     }
   }
 
   function calculateDirection(direction: TMenuDirection, gap: number, wrapper: HTMLDivElement, trigger: HTMLButtonElement) {
-    switch (direction) {
-      case 'bottom': {
-        wrapper.style.top = `${trigger.offsetHeight + gap}px`;
-
-        break;
-      }
-
-      case 'top': {
-        wrapper.style.bottom = `${trigger.offsetHeight + gap}px`;
-
-        break;
-      }
-
-      case 'left': {
-        wrapper.style.left = `${trigger.offsetWidth + gap}px`;
-
-        break;
-      }
-
-      case 'right': {
-        wrapper.style.right = `${trigger.offsetWidth + gap}px`;
-
-        break;
-      }
-    }
+    if (direction === 'bottom') wrapper.style.top = `${trigger.offsetHeight + gap}px`;
+    if (direction === 'top') wrapper.style.bottom = `${trigger.offsetHeight + gap}px`;
+    if (direction === 'left') wrapper.style.left = `-${wrapper.offsetWidth + gap}px`;
+    if (direction === 'right') wrapper.style.right = `-${wrapper.offsetWidth + gap}px`;
   }
 
-  function calculateAlignment({ align, direction, initialWrapperWidth, trigger, wrapper, parent }: { align: TMenuAlign, direction: TMenuDirection, initialWrapperWidth: number, wrapper: HTMLDivElement, trigger: HTMLButtonElement, parent: HTMLDivElement }) {
-    switch (align) {
-      case 'center': {
-        if (direction === 'left' || direction === 'right') {
-          wrapper.style.top = `-${(wrapper.offsetHeight / 2) - (trigger.offsetHeight / 2)}px`;
+  function calculateAlignment({ align, direction, trigger, wrapper }: { align: TMenuAlign, direction: TMenuDirection, wrapper: HTMLDivElement, trigger: HTMLButtonElement }) {
+    const alignX = direction === 'bottom' || direction === 'top';
+    const alignY = direction === 'left' || direction === 'right';
 
-          break;
-        }
-
-        // Stretch menu if it's original width larger than current parent width
-        if (parent.offsetWidth < initialWrapperWidth) {
-          wrapper.style.left = `0`;
-          wrapper.style.width = '100%';
-
-          break;
-        } else {
-          wrapper.style.width = `${initialWrapperWidth}px`;
-        }
-
-
-        // Check if element can not offset without overflowing viewport
-        if ((trigger.offsetWidth / 2) - (initialWrapperWidth / 2) < 0) {
-          wrapper.style.left = `0`;
-
-          break;
-        }
-
-        wrapper.style.left = `${(trigger.offsetWidth / 2) - (initialWrapperWidth / 2)}px`;
-
-        break;
+    if (alignX) {
+      if (align === 'center') {
+        wrapper.style.left = '50%';
+        wrapper.style.transform = 'translateX(-50%)';
       }
 
-      case 'stretch': {
-        if (direction === 'left' || direction === 'right') {
-          console.warn(`[fkw-menu]: Align ${align} does not work with ${direction} direction`);
-        } else {
-          wrapper.style.width = '100%';
-        }
+      if (align === 'start') wrapper.style.left = '0';
+      if (align === 'end') wrapper.style.right = '0';
+      if (align === 'stretch') wrapper.style.width = '100%';
+    }
 
-        break;
-      }
-
-      case 'left': {
-        if (direction === 'left' || direction === 'right') {
-          // Align by top side of trigger
-          wrapper.style.top = '0';
-        } else {
-          // Stretch menu if it's original width larger than current parent width
-          if (parent.offsetWidth < initialWrapperWidth) {
-            wrapper.style.left = `0`;
-            wrapper.style.width = '100%';
-
-            break;
-          } else {
-            wrapper.style.left = `0`;
-            wrapper.style.width = `${initialWrapperWidth}px`;
-          }
-
-        }
-
-        break;
-      }
-
-      case 'right': {
-        if (direction === 'left' || direction === 'right') {
-          // Align by bottom side of trigger
-          wrapper.style.bottom = '0';
-        } else {
-          // Stretch menu if it's original width larger than current parent width
-          if (parent.offsetWidth < initialWrapperWidth) {
-            wrapper.style.right = `0`;
-            wrapper.style.width = '100%';
-
-            break;
-          } else {
-            wrapper.style.right = `0`;
-            wrapper.style.width = `${initialWrapperWidth}px`;
-          }
-
-        }
-
-        break;
-      }
+    if (alignY) {
+      if (align === 'center') wrapper.style.top = `-${(wrapper.offsetHeight / 2) - (trigger.offsetHeight / 2)}px`;
+      if (align === 'start') wrapper.style.top = '0';
+      if (align === 'end') wrapper.style.bottom = '0';
+      if (align === 'stretch') throw new EFKW(`Align ${align} does not work with ${direction} direction`);
     }
   }
 
@@ -256,7 +163,7 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
       parentRef,
       toggleMenu
     }}>
-      <div className={cn(`fkw-menu`, settings.styles === 'verbose' && 'fkw-menu--verbose', settings.styles === 'pretty' && 'fkw-menu--pretty', isOpen && 'fkw-menu--active', className)} id={ID} ref={parentRef}>
+      <div className={cn(`fkw-menu`, settings.verbose && 'fkw-menu--verbose', isOpen && 'fkw-menu--active', className)} id={ID} ref={parentRef}>
         {children}
       </div>
     </MenuContext.Provider>
@@ -264,11 +171,11 @@ export const Menu: React.FC<IMenuProps> = ({ className, children, settings: sets
 };
 
 /** Menu trigger */
-export const MenuTrigger: React.FC<IMenuTriggerProps> = ({ className, children, callback, primary, disabled }) => {
+export const MenuTrigger: React.FC<IMenuTriggerProps> = ({ className, children, callback, anchor, disabled }) => {
   const { toggleMenu, isOpen } = useContext(MenuContext);
 
   return (
-    <button className={cn(`fkw-menu_trigger`, primary && 'fkw-menu_trigger--primary', isOpen && 'fkw-menu_trigger--active', className)} tabIndex={0} onClick={() => { toggleMenu(); callback ? callback() : null; }} disabled={Boolean(disabled)}>
+    <button className={cn(`fkw-menu_trigger`, anchor && 'fkw-menu_trigger--anchor', isOpen && 'fkw-menu_trigger--active', className)} tabIndex={0} onClick={() => { toggleMenu(); callback ? callback() : null; }} disabled={Boolean(disabled)}>
       {children}
     </button>
   );
