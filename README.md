@@ -168,7 +168,7 @@ pnpm install @fullkekw/fkw-menu
 
 Using yarn
 ```
-yatn add @fullkekw/fkw-menu
+yarn add @fullkekw/fkw-menu
 ```
 
 Licensed under MIT <br>
