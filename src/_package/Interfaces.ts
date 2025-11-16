@@ -2,7 +2,7 @@ import { ReactNode, RefObject } from "react";
 
 export interface IMenuContextProps {
   isOpen: boolean
-  parentRef: RefObject<HTMLDivElement>
+  parentRef: RefObject<HTMLDivElement | null>
   toggleMenu: () => void
 }
 
